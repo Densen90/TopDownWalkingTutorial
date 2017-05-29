@@ -1,0 +1,42 @@
+- aus dem Ordner Model das Model und dessen Texturen importieren (erst Texturen, dann werden sie automatisch auf die Materialien gesetzt)
+- die Texturen auf die Materialien des Models setzen (Materialien werden automatisch erstellt)
+- aus dem Ordner Animations die Animationen importieren (hier fehlt üblicherweise das Model)
+wenn eine Animation ausgewählt, kann man das Model darauf ziehen und die animation abspielen
+- ersetze Player in der Szene mit Model
+- shadow entfernen 
+- wie zu sehen ist schon ein animator auf dem model --> nötig um Figur zu animieren
+- rigidbody und movement script auf knight, capsule collider auf body: bewegung funktioniert, aber noch keine animation
+- Erstelle animator controller: dieser steuert wann welche animation abgespielt wird
+- Öffne Fenster: Animator
+- Hier gibt es einen Entry State: Hier startet alles, wenn die Figur erstellt wird
+- Wenn nichts gemacht wird, ist er im Idle State, das soll geloopt werden
+- Ziehe Animation von "Mot_Knight@Wait" in den Animator
+- Werte Motion, Speed etc erklären
+- weise animator controller dem model zu, starten und sehen was passiert --> fehlender Loop
+- gehe auf animation, und wähle "Loop Time" aus --> starte erneut
+- nächster Schritt: figur soll laufen, das ist an Bedingung geknüpft, und zwar an die, dass sich meine figur bewegt
+- in animator: Parameters --> + --> Float --> MoveSpeed
+- Füge animation "Mot_Knight@Walk" hinzu (auch hier muss Loop Time aktiviert sein)
+- rechtsklick aif Idle --> Make Transition --> zu walk (und zurück)
+- klicke auf pfeil: Conditions --> + --> MoveSpeed Greater 0.1 (anderer Pfeil MoveSpeed Less 0.1)
+- Jetzt wird die Condition gesetzt im Script (Movement.cs)
+
+private Animator animator;
+private float animWalkSpeed = 0f;
+private const float TransitionSpeed = 20f;
+
+animator = this.GetComponent<Animator>();
+
+float maxInput = Mathf.Max(Mathf.Abs(horizontal), Mathf.Abs(vertical));
+animWalkSpeed = Mathf.Lerp(animWalkSpeed, maxInput, Time.deltaTime);
+animator.SetFloat("MoveSpeed", maxInput);
+
+- animation passt noch nicht richtig: sollte schneller bewegen und früher damit anfangen --> gehe zum animator fenster
+- setze bei Walk den Speed auf 2
+- gehe auf transition: hier wird die Übergangsanimation festgelegt --> Haken bei Has Exit time raus, dann wird nicht auf Ende der Animation für Übergang gewartet
+- jetzt soll Person noch angreifen können --> mite Leertaste wird event ausgelöst, welches schlaganimation ausführen soll
+- Mot_Knight@Attack Animation dem Controller hinzufügen, transition von walking und standing
+- Parameter Trigger "Attack" hinzufügen, bei Transition als Condition hinzufügen
+- im Code:
+
+if (Input.GetKeyDown(KeyCode.Space)) animator.SetTrigger("Attack");
