@@ -40,3 +40,44 @@ animator.SetFloat("MoveSpeed", maxInput);
 - im Code:
 
 if (Input.GetKeyDown(KeyCode.Space)) animator.SetTrigger("Attack");
+
+
+
+
+-----------------------------------------
+
+- alles mit Bewegung von vorher kann entfernt werden (Rigidbody, Movement mit Pfeiltasten)
+- Window -> Navigation: NavMesh erstellen: alle objekte auswählen die nicht bewegt werden in der Scene und auf static stellen, dann im NavMeshEditor als walkable und nicht walkable deklarieren
+- dann baken, blauer Bereich zeigt an, wo der Spieler sich nun bewegen kann
+- für Bewegung: NavMeshAgent auf Character ziehen
+- nun mit Klick bewegen, dazu muss geprüft werden, wann der boden angeklickt wird
+- ändere Layer vom Boden auf "Ground" ab, auf dessen Layer später im Code abgefragt wird
+- Code im Movement abändern auf:
+
+private NavMeshAgent agent;
+
+agent = this.GetComponent<NavMeshAgent>();
+
+if (Input.GetMouseButtonDown(0))
+{
+    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    RaycastHit hit;
+
+    if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground")))
+    {
+        agent.SetDestination(hit.point);
+    }
+}
+
+- bewegt sich, aber ohne Animation, also folgende zeile im Raycast hinzufügen
+
+animator.SetFloat("MoveSpeed", 1f);
+
+- spieler bewegt sich, wenn auf Boden geklickt, aber hört nicht mehr auf, also folgende Zeile Code hinzufügen
+
+if (agent.remainingDistance <= 0.2f)
+{
+    animator.SetFloat("MoveSpeed", 0f);
+}
+
+- fertige AI mit A*

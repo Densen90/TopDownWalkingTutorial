@@ -1,44 +1,42 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 public class Movement : MonoBehaviour
 {
     public float MoveSpeed;
 
-    private Rigidbody myRigidbody;
     private Vector3 moveVelocity;
 
     private Animator animator;
-    private float animWalkSpeed = 0f;
-    private const float TransitionSpeed = 20;
+    private NavMeshAgent agent;
 
     // Use this for initialization
     void Start()
     {
-        myRigidbody = this.GetComponent<Rigidbody>();
         animator = this.GetComponent<Animator>();
+        agent = this.GetComponent<NavMeshAgent>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        var moveDirection = new Vector3(horizontal, 0f, vertical);
-
-        moveVelocity = moveDirection * MoveSpeed;
-
-        this.transform.LookAt(this.transform.position + moveDirection);
-
-        float maxInput = Mathf.Max(Mathf.Abs(horizontal), Mathf.Abs(vertical));
-        animWalkSpeed = Mathf.Lerp(animWalkSpeed, maxInput, Time.deltaTime*TransitionSpeed);
-        animator.SetFloat("MoveSpeed", maxInput);
-
         if (Input.GetKeyDown(KeyCode.Space)) animator.SetTrigger("Attack");
-    }
 
-    void FixedUpdate()
-    {
-        myRigidbody.velocity = moveVelocity;
+        if (agent.remainingDistance <= 0.2f)
+        {
+            animator.SetFloat("MoveSpeed", 0f);
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground")))
+            {
+                animator.SetFloat("MoveSpeed", 1f);
+                agent.SetDestination(hit.point);
+            }
+        }
     }
 }
